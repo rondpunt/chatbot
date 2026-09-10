@@ -48,11 +48,13 @@ Open [http://localhost:3000](http://localhost:3000).
 | `GOOGLE_GENERATIVE_AI_API_KEY` | No | Gemini failover |
 | `POSTGRES_URL` | Yes | Neon Postgres (free tier on Vercel Marketplace) |
 | `BLOB_READ_WRITE_TOKEN` | No | File uploads only |
-| `REDIS_URL` | No | Resumable streams only |
+| `REDIS_URL` | No | Shared IP rate limits across instances + resumable streams |
 
 4. Deploy. Vercel runs `pnpm build` (includes DB migrate).
 
 **Security:** `GROQ_API_KEY` and `GOOGLE_GENERATIVE_AI_API_KEY` are used only in server-side API routes. Never prefix them with `NEXT_PUBLIC_`.
+
+**Rate limiting:** In production, every chat request is IP rate-limited (10/hour). Without `REDIS_URL`, a **per-instance in-memory sliding window** still applies and returns **429** when exceeded — it never fails open. Add `REDIS_URL` when you run multiple instances so limits are shared via Redis.
 
 ---
 
@@ -93,6 +95,8 @@ Open [http://localhost:3000](http://localhost:3000).
 4. Deploy.
 
 **Beveiliging:** API-sleutels horen **niet** in de browser. Gebruik geen `NEXT_PUBLIC_` prefix voor `GROQ_API_KEY` of Google-keys.
+
+**Rate limiting:** In productie geldt een IP-limiet (10/uur). Zonder `REDIS_URL` blijft een **in-memory sliding window per instance** actief met **429** bij overschrijding — nooit fail-open. Gebruik `REDIS_URL` bij meerdere instances voor gedeelde limieten via Redis.
 
 ---
 
