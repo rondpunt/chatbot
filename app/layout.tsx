@@ -7,9 +7,10 @@ import "./globals.css";
 import { SessionProvider } from "next-auth/react";
 
 export const metadata: Metadata = {
-  description: "Next.js chatbot template using the AI SDK.",
-  metadataBase: new URL("https://chat.vercel.ai"),
-  title: "Next.js Chatbot Template",
+  description:
+    "Free ChatGPT-style chat powered by Groq (Llama 3.3 70B) with Gemini Flash failover.",
+  metadataBase: new URL("https://github.com/rondpunt/chatbot"),
+  title: "Chatbot — free Groq + Gemini",
 };
 
 export const viewport = {
@@ -70,7 +71,7 @@ export default function RootLayout({
       <body className="antialiased">
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="dark"
           disableTransitionOnChange
           enableSystem
         >

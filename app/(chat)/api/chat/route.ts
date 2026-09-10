@@ -195,7 +195,7 @@ export async function POST(request: Request) {
     }
 
     const modelConfig = chatModels.find((m) => m.id === chatModel);
-    const modelCapabilities = await getCapabilities();
+    const modelCapabilities = getCapabilities();
     const capabilities = modelCapabilities[chatModel];
     const isReasoningModel = capabilities?.reasoning === true;
     const supportsTools = capabilities?.tools === true;
@@ -236,20 +236,16 @@ export async function POST(request: Request) {
         writeWaitingStatus("waiting", "Waiting...");
 
         healthCheckTimer = setTimeout(() => {
-          getModelAvailability(chatModel)
-            .then((availability) => {
-              if (availability === "impacted") {
-                writeWaitingStatus(
-                  "health",
-                  `${modelName} may be slow or unavailable right now...`
-                );
-              } else {
-                writeWaitingStatus("still-waiting", "Still waiting...");
-              }
-            })
-            .catch(() => {
-              writeWaitingStatus("still-waiting", "Still waiting...");
-            });
+          const availability = getModelAvailability(chatModel);
+
+          if (availability === "impacted") {
+            writeWaitingStatus(
+              "health",
+              `${modelName} may be slow or unavailable right now...`
+            );
+          } else {
+            writeWaitingStatus("still-waiting", "Still waiting...");
+          }
         }, HEALTH_CHECK_DELAY_MS);
 
         const markModelActive = () => {
@@ -293,14 +289,6 @@ export async function POST(request: Request) {
           },
           onError() {
             stopWaitingStatus();
-          },
-          providerOptions: {
-            ...(modelConfig?.gatewayOrder && {
-              gateway: { order: modelConfig.gatewayOrder },
-            }),
-            ...(modelConfig?.reasoningEffort && {
-              openai: { reasoningEffort: modelConfig.reasoningEffort },
-            }),
           },
           stopWhen: isStepCount(5),
           telemetry: {
@@ -391,11 +379,15 @@ export async function POST(request: Request) {
       onError: (error) => {
         if (
           error instanceof Error &&
-          error.message?.includes(
-            "AI Gateway requires a valid credit card on file to service requests"
-          )
+          error.message?.includes("GROQ_API_KEY is not configured")
         ) {
-          return "AI Gateway requires a valid credit card on file to service requests. Please visit https://vercel.com/d?to=%2F%5Bteam%5D%2F%7E%2Fai%3Fmodal%3Dadd-credit-card to add a card and unlock your free credits.";
+          return "Groq is not configured. Set GROQ_API_KEY in your environment variables.";
+        }
+        if (
+          error instanceof Error &&
+          error.message?.includes("GOOGLE_GENERATIVE_AI_API_KEY")
+        ) {
+          return "Gemini Flash is not configured. Set GOOGLE_GENERATIVE_AI_API_KEY or use Llama 3.3 70B.";
         }
         return "Oops, an error occurred!";
       },
@@ -428,15 +420,6 @@ export async function POST(request: Request) {
 
     if (error instanceof ChatbotError) {
       return error.toResponse();
-    }
-
-    if (
-      error instanceof Error &&
-      error.message?.includes(
-        "AI Gateway requires a valid credit card on file to service requests"
-      )
-    ) {
-      return new ChatbotError("bad_request:activate_gateway").toResponse();
     }
 
     console.error("Unhandled error in chat API:", error, { vercelId });

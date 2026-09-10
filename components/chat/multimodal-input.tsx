@@ -864,6 +864,7 @@ function PureModelSelectorCompact({
               cohere: "Cohere",
               deepseek: "DeepSeek",
               google: "Google",
+              groq: "Groq",
               inception: "Inception",
               kwaipilot: "Kwaipilot",
               meituan: "Meituan",

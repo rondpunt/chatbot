@@ -1,71 +1,120 @@
-<a href="https://chatbot.ai-sdk.dev/demo">
-  <img alt="Chatbot" src="app/(chat)/opengraph-image.png">
-  <h1 align="center">Chatbot</h1>
-</a>
+# Chatbot — free Groq + Gemini
 
-<p align="center">
-    Chatbot (formerly AI Chatbot) is a free, open-source template built with Next.js and the AI SDK that helps you quickly build powerful chatbot applications.
-</p>
+A free, ChatGPT-style chat app built on the [Vercel chatbot template](https://github.com/vercel/chatbot). Primary model: **Llama 3.3 70B** via [Groq](https://groq.com). Optional failover: **Gemini 2.0 Flash** via Google AI Studio.
 
-<p align="center">
-  <a href="https://chatbot.ai-sdk.dev/docs"><strong>Read Docs</strong></a> ·
-  <a href="#features"><strong>Features</strong></a> ·
-  <a href="#model-providers"><strong>Model Providers</strong></a> ·
-  <a href="#deploy-your-own"><strong>Deploy Your Own</strong></a> ·
-  <a href="#running-locally"><strong>Running locally</strong></a>
-</p>
-<br/>
+No paid OpenAI subscription required.
 
-## Features
+---
 
-- [Next.js](https://nextjs.org) App Router
-  - Advanced routing for seamless navigation and performance
-  - React Server Components (RSCs) and Server Actions for server-side rendering and increased performance
-- [AI SDK](https://ai-sdk.dev/docs/introduction)
-  - Unified API for generating text, structured objects, and tool calls with LLMs
-  - Hooks for building dynamic chat and generative user interfaces
-  - Supports OpenAI, Anthropic, Google, xAI, and other model providers via AI Gateway
-- [shadcn/ui](https://ui.shadcn.com)
-  - Styling with [Tailwind CSS](https://tailwindcss.com)
-  - Component primitives from [Radix UI](https://radix-ui.com) for accessibility and flexibility
-- Data Persistence
-  - [Neon Serverless Postgres](https://vercel.com/marketplace/neon) for saving chat history and user data
-  - [Vercel Blob](https://vercel.com/storage/blob) for efficient file storage
-- [Auth.js](https://authjs.dev)
-  - Simple and secure authentication
+## English — quick start
 
-## Model Providers
+### 1. Get a free Groq API key
 
-This template uses the [Vercel AI Gateway](https://vercel.com/docs/ai-gateway) to access multiple AI models through a unified interface. Models are configured in `lib/ai/models.ts` with per-model provider routing. Included models: Mistral, Moonshot, DeepSeek, OpenAI, and xAI.
+1. Create an account at [console.groq.com](https://console.groq.com).
+2. Open **API Keys** and create a key.
+3. Copy the key — you will add it as `GROQ_API_KEY` (server-only).
 
-### AI Gateway Authentication
+### 2. Optional: Gemini Flash failover
 
-**For Vercel deployments**: Authentication is handled automatically via OIDC tokens.
+1. Go to [Google AI Studio](https://aistudio.google.com/apikey).
+2. Create an API key.
+3. Add it as `GOOGLE_GENERATIVE_AI_API_KEY`.
 
-**For non-Vercel deployments**: You need to provide an AI Gateway API key by setting the `AI_GATEWAY_API_KEY` environment variable in your `.env.local` file.
+When Groq is unavailable, the app automatically retries with Gemini Flash (if this key is set). You can also pick **Gemini 2.0 Flash** in the model selector.
 
-With the [AI SDK](https://ai-sdk.dev/docs/introduction), you can also switch to direct LLM providers like [OpenAI](https://openai.com), [Anthropic](https://anthropic.com), [Cohere](https://cohere.com/), and [many more](https://ai-sdk.dev/providers/ai-sdk-providers) with just a few lines of code.
-
-## Deploy Your Own
-
-You can deploy your own version of Chatbot to Vercel with one click:
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/templates/next.js/chatbot)
-
-## Running locally
-
-You will need to use the environment variables [defined in `.env.example`](.env.example) to run Chatbot. It's recommended you use [Vercel Environment Variables](https://vercel.com/docs/projects/environment-variables) for this, but a `.env` file is all that is necessary.
-
-> Note: You should not commit your `.env` file or it will expose secrets that will allow others to control access to your various AI and authentication provider accounts.
-
-1. Install Vercel CLI: `npm i -g vercel`
-2. Link local instance with Vercel and GitHub accounts (creates `.vercel` directory): `vercel link`
-3. Download your environment variables: `vercel env pull`
+### 3. Run locally
 
 ```bash
+cp .env.example .env.local
+# Edit .env.local — at minimum set AUTH_SECRET and GROQ_API_KEY
+
 pnpm install
-pnpm db:migrate # Setup database or apply latest database changes
+pnpm db:migrate
 pnpm dev
 ```
 
-Your app template should now be running on [localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000).
+
+### 4. Deploy on Vercel (Hobby — free)
+
+1. Push this repo to GitHub ([rondpunt/chatbot](https://github.com/rondpunt/chatbot)).
+2. Import the project in [Vercel](https://vercel.com/new).
+3. Add environment variables in **Project → Settings → Environment Variables**:
+
+| Variable | Required | Notes |
+|----------|----------|-------|
+| `AUTH_SECRET` | Yes | Random 32+ char secret |
+| `GROQ_API_KEY` | Yes | From Groq console |
+| `GOOGLE_GENERATIVE_AI_API_KEY` | No | Gemini failover |
+| `POSTGRES_URL` | Yes | Neon Postgres (free tier on Vercel Marketplace) |
+| `BLOB_READ_WRITE_TOKEN` | No | File uploads only |
+| `REDIS_URL` | No | Resumable streams only |
+
+4. Deploy. Vercel runs `pnpm build` (includes DB migrate).
+
+**Security:** `GROQ_API_KEY` and `GOOGLE_GENERATIVE_AI_API_KEY` are used only in server-side API routes. Never prefix them with `NEXT_PUBLIC_`.
+
+---
+
+## Nederlands — snelle start
+
+### 1. Gratis Groq API-sleutel
+
+1. Maak een account op [console.groq.com](https://console.groq.com).
+2. Ga naar **API Keys** en maak een sleutel aan.
+3. Kopieer de sleutel — die wordt `GROQ_API_KEY` (alleen op de server).
+
+### 2. Optioneel: Gemini Flash als fallback
+
+1. Ga naar [Google AI Studio](https://aistudio.google.com/apikey).
+2. Maak een API-sleutel aan.
+3. Zet die in `GOOGLE_GENERATIVE_AI_API_KEY`.
+
+Als Groq even niet beschikbaar is, probeert de app automatisch **Gemini Flash** (als deze sleutel staat). Je kunt Gemini ook handmatig kiezen in de modelkiezer.
+
+### 3. Lokaal draaien
+
+```bash
+cp .env.example .env.local
+# Vul minimaal AUTH_SECRET en GROQ_API_KEY in
+
+pnpm install
+pnpm db:migrate
+pnpm dev
+```
+
+Open [http://localhost:3000](http://localhost:3000).
+
+### 4. Deployen op Vercel (Hobby — gratis)
+
+1. Push naar GitHub ([rondpunt/chatbot](https://github.com/rondpunt/chatbot)).
+2. Importeer het project op [Vercel](https://vercel.com/new).
+3. Voeg omgevingsvariabelen toe onder **Project → Settings → Environment Variables** (zie tabel hierboven).
+4. Deploy.
+
+**Beveiliging:** API-sleutels horen **niet** in de browser. Gebruik geen `NEXT_PUBLIC_` prefix voor `GROQ_API_KEY` of Google-keys.
+
+---
+
+## Models
+
+| Model | Provider | Role |
+|-------|----------|------|
+| Llama 3.3 70B | Groq | Default chat |
+| Llama 3.1 8B Instant | Groq | Chat titles |
+| Gemini 2.0 Flash | Google | Failover + manual selection |
+
+Configured in `lib/ai/models.ts` and `lib/ai/providers.ts`.
+
+---
+
+## Stack
+
+- [Next.js](https://nextjs.org) App Router
+- [AI SDK](https://ai-sdk.dev) with `@ai-sdk/groq` and `@ai-sdk/google`
+- [Auth.js](https://authjs.dev) for login
+- [Neon Postgres](https://neon.tech) for chat history (via Vercel)
+
+## License
+
+See [LICENSE](LICENSE).
