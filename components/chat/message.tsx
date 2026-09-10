@@ -177,7 +177,7 @@ const PurePreviewMessage = ({
       return (
         <MessageContent
           className={cn("text-[13px] leading-[1.65]", {
-            "w-fit max-w-[min(80%,56ch)] overflow-hidden break-words rounded-2xl rounded-br-lg border border-border/30 bg-gradient-to-br from-secondary to-muted px-3.5 py-2 shadow-[var(--shadow-card)]":
+            "w-fit max-w-[min(80%,56ch)] overflow-hidden break-words rounded-bubble bg-user-bubble px-3.5 py-2 text-foreground":
               message.role === "user",
           })}
           data-testid="message-content"
@@ -261,7 +261,7 @@ const PurePreviewMessage = ({
       if (part.output && "error" in part.output) {
         return (
           <div
-            className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-500 dark:bg-red-950/50"
+            className="rounded-bubble border border-destructive/30 bg-destructive/10 p-4 text-destructive"
             key={toolCallId}
           >
             Error creating document: {String(part.output.error)}
@@ -284,7 +284,7 @@ const PurePreviewMessage = ({
       if (part.output && "error" in part.output) {
         return (
           <div
-            className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-500 dark:bg-red-950/50"
+            className="rounded-bubble border border-destructive/30 bg-destructive/10 p-4 text-destructive"
             key={toolCallId}
           >
             Error updating document: {String(part.output.error)}
