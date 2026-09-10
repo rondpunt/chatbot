@@ -6,7 +6,7 @@ import type { Vote } from "@/lib/db/schema";
 import type { ChatMessage } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { useDataStream } from "./data-stream-provider";
-import { Greeting } from "./greeting";
+import { ChatErrorState, Greeting } from "./greeting";
 import { PreviewMessage, ThinkingMessage } from "./message";
 
 type MessagesProps = {
@@ -63,8 +63,12 @@ function PureMessages({
     scrollToBottom("smooth");
   }, [scrollToBottom]);
 
+  const handleRetry = useCallback(() => {
+    regenerate();
+  }, [regenerate]);
+
   return (
-    <div className="relative flex-1 bg-background">
+    <div className="relative flex-1 bg-surface">
       {messages.length === 0 && !isLoading && (
         <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
           <Greeting />
@@ -73,7 +77,7 @@ function PureMessages({
       <div
         className={cn(
           "absolute inset-0 touch-pan-y overflow-y-auto",
-          messages.length > 0 ? "bg-background" : "bg-transparent"
+          messages.length > 0 ? "bg-surface" : "bg-transparent"
         )}
         ref={messagesContainerRef}
         style={isArtifactVisible ? { scrollbarWidth: "none" } : undefined}
@@ -105,6 +109,13 @@ function PureMessages({
 
           {status === "submitted" && messages.at(-1)?.role !== "assistant" && (
             <ThinkingMessage />
+          )}
+
+          {status === "error" && (
+            <ChatErrorState
+              message="Something went wrong while generating a response. Check your API keys or try again."
+              onRetry={handleRetry}
+            />
           )}
 
           <div

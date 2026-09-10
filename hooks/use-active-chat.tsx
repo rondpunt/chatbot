@@ -118,7 +118,10 @@ export function ActiveChatProvider({ children }: { children: ReactNode }) {
       setDataStream((ds) => (ds ? [...ds, dataPart] : []));
     },
     onError: (error) => {
-      if (error.message?.includes("AI Gateway requires a valid credit card")) {
+      if (
+        error.message?.includes("GROQ_API_KEY is not configured") ||
+        error.message?.includes("Groq is not configured")
+      ) {
         setShowCreditCardAlert(true);
       } else if (error instanceof ChatbotError) {
         toast({ description: error.message, type: "error" });
